@@ -1,0 +1,106 @@
+﻿@page
+@model Lab.UI.Pages.Users.RegisterUserModel
+@{
+}
+
+<section>
+    <h1>
+        Criar conta
+    </h1>
+    <form method="POST">
+        <fieldset>
+            <legend class="bg-light p-2">
+                Dados pessoais
+            </legend>
+            <div class="row p-2">
+                <div class="col-lg-12">
+                    <label class="form-label">
+                        Nome
+                    </label>
+                    <br />
+                    <input class="form-control" asp-for="@Model.UserData.Name" />
+                    <span asp-validation-for="UserData.Name" class="text-danger"></span>
+                </div>
+
+                <div class="col-lg-12">
+                    <label class="form-label">
+                        Email
+                    </label>
+                    <br />
+                    <input type="email" class="form-control" asp-for="@Model.UserData.Email" />
+                    <span asp-validation-for="UserData.Email" class="text-danger"></span>
+                </div>
+
+                <div class="col-lg-6">
+                    <label class="form-label">
+                        Nome de usuário
+                    </label>
+                    <br />
+                    <input type="text" class="form-control" asp-for="@Model.UserData.UserName" />
+                    <span asp-validation-for="UserData.UserName" class="text-danger"></span>
+                </div>
+
+                <div class="col-lg-6">
+                    <label class="form-label">
+                        Senha
+                    </label>
+                    <br />
+                    <input type="password" class="form-control" asp-for="@Model.UserData.Password" />
+                    <span asp-validation-for="UserData.Password" class="text-danger"></span>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend class="bg-light p-2 mt-2">
+                Dados acadêmicos
+            </legend>
+
+            <div class="row">
+                <div class="col-lg-4">
+                    <label class="form-label">
+                        Instituição
+                    </label>
+                    <br />
+                    <input type="text" class="form-control" asp-for="@Model.UserData.AcademicFormation.Institution" />
+                    <span asp-validation-for="UserData.AcademicFormation.Institution" class="text-danger"></span>
+                </div>
+
+                <div class="col-lg-4">
+                    <label class="form-label">
+                        Curso
+                    </label>
+                    <br />
+                    <input type="text" class="form-control" asp-for="@Model.UserData.AcademicFormation.Course" />
+                    <span asp-validation-for="UserData.AcademicFormation.Course" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-lg-4">
+                    <label class="form-label">
+                        Status
+                    </label>
+                    <br />
+                    <select class="form-select" asp-items="Model.AcademicStatusOptions" asp-for="@Model.UserData.AcademicFormation.Status">
+                    </select>
+                    <span asp-validation-for="UserData.AcademicFormation.Status" class="text-danger"></span>
+                </div>
+
+                <div class="col-lg-4">
+                    <label class="form-label">
+                        Nível de formação
+                    </label>
+                    <br />
+                    <select class="form-select" asp-items="Model.AcademicFormationOptions" asp-for="@Model.UserData.AcademicFormation.Formation">
+                    </select>
+                    <span asp-validation-for="UserData.AcademicFormation.Formation" class="text-danger"></span>
+                </div>
+
+            </div>
+        </fieldset>
+
+        <button class="btn btn-success mt-2" type="submit">
+            Confirmar
+        </button>
+    </form>
+</section>
