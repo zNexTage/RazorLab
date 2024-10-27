@@ -1,7 +1,5 @@
 ﻿@page
 @model Lab.UI.Pages.Users.RegisterUserModel
-@{
-}
 
 <section>
     <h1>
@@ -56,51 +54,190 @@
                 Dados acadêmicos
             </legend>
 
-            <div class="row">
-                <div class="col-lg-4">
-                    <label class="form-label">
-                        Instituição
-                    </label>
-                    <br />
-                    <input type="text" class="form-control" asp-for="@Model.UserData.AcademicFormation.Institution" />
-                    <span asp-validation-for="UserData.AcademicFormation.Institution" class="text-danger"></span>
+            @for (int i = 0; i < Model.UserData.AcademicFormations.Count; i++)
+            {
+                <div class="row py-2 @(i > 0 ? "mt-3 border-top" : "")" data-id="Formation" data-index="@i">
+
+                    <div class="col-lg-4" id="Course_@i">
+                        @Html.LabelFor(m => m.UserData.AcademicFormations[i].Course)
+                        <br />
+                        <input type="text" class="form-control" asp-for="@Model.UserData.AcademicFormations[i].Course" />
+                        <span asp-validation-for="@Model.UserData.AcademicFormations[i].Course" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-lg-4" id="Status_@i">
+                        @Html.LabelFor(m => m.UserData.AcademicFormations[i].Status)
+                        <br />
+                        <select class="form-select" asp-items="Model.AcademicStatusOptions" asp-for="@Model.UserData.AcademicFormations[i].Status">
+                        </select>
+                        <span asp-validation-for="@Model.UserData.AcademicFormations[i].Status" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-lg-4" id="Formation_@i">
+                        @Html.LabelFor(m => m.UserData.AcademicFormations[i].Formation)
+                        <br />
+                        <select class="form-select" asp-items="Model.AcademicFormationOptions" asp-for="@Model.UserData.AcademicFormations[i].Formation">
+                        </select>
+                        <span asp-validation-for="@Model.UserData.AcademicFormations[i].Formation" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-lg-12" id="Institution_@i">
+                        @Html.LabelFor(m => m.UserData.AcademicFormations[i].Institution)
+                        <br />
+                        <input type="text" class="form-control" asp-for="@Model.UserData.AcademicFormations[i].Institution" />
+                        <span asp-validation-for="@Model.UserData.AcademicFormations[i].Institution" class="text-danger"></span>
+                    </div>
+
+                    @if (i > 0)
+                    {
+                        <div class="col-lg-12 text-end mt-2">
+                            <button class="btn btn-danger" type="button" onclick="onBtnRemoveClick(this);">
+                                Remover formação
+                            </button>
+                        </div>
+                    }
                 </div>
+            }
 
-                <div class="col-lg-4">
-                    <label class="form-label">
-                        Curso
-                    </label>
-                    <br />
-                    <input type="text" class="form-control" asp-for="@Model.UserData.AcademicFormation.Course" />
-                    <span asp-validation-for="UserData.AcademicFormation.Course" class="text-danger"></span>
-                </div>
-
-
-                <div class="col-lg-4">
-                    <label class="form-label">
-                        Status
-                    </label>
-                    <br />
-                    <select class="form-select" asp-items="Model.AcademicStatusOptions" asp-for="@Model.UserData.AcademicFormation.Status">
-                    </select>
-                    <span asp-validation-for="UserData.AcademicFormation.Status" class="text-danger"></span>
-                </div>
-
-                <div class="col-lg-4">
-                    <label class="form-label">
-                        Nível de formação
-                    </label>
-                    <br />
-                    <select class="form-select" asp-items="Model.AcademicFormationOptions" asp-for="@Model.UserData.AcademicFormation.Formation">
-                    </select>
-                    <span asp-validation-for="UserData.AcademicFormation.Formation" class="text-danger"></span>
-                </div>
-
-            </div>
+            <button id="btnNewFormation" type="button" class="btn btn-info mt-2 text-light">
+                Adicionar outra formação
+            </button>
         </fieldset>
+
+        <hr />
 
         <button class="btn btn-success mt-2" type="submit">
             Confirmar
         </button>
     </form>
+
 </section>
+
+@section Scripts
+{
+    <script>
+        const onBtnRemoveClick = element => {
+            const formationDiv = element.parentElement.parentElement;
+            removeFields(formationDiv);
+        }
+
+
+        $("#btnNewFormation").on("click", event => {
+            // Obtém todas as divs que encapsulam os campos relacionados a formação
+            const formationFieldsDiv = $("[data-id='Formation']");
+
+            // Obtém o index atual dos formulários de formação
+            const currentIndex = formationFieldsDiv.length - 1;
+
+            // Obtém a lista de campos relacionados a formação
+            const academicFormationFields = @Html.Raw(@Model.AcademicFormationFields);
+
+            // Cria a nova seção para os campos de formação
+            const formIndex = currentIndex + 1;
+
+            // cria uma nova linha para os novos campos.
+            const newFormationField = $(`<div class="row mt-3" data-id="Formation" data-index="${formIndex}"></div>`);
+
+            academicFormationFields.forEach(fieldName => {
+                const field = appendField(formationFieldsDiv[currentIndex], currentIndex, fieldName);
+
+                $(newFormationField).append(field);
+            });
+
+            const removeButton = $(`
+                             <div class="col-lg-12 text-end mt-2">
+                                            <button class="btn btn-danger" type="button">
+                                                Remover formação
+                                            </button>
+                                   </div>
+                    `);            
+
+            $(newFormationField).append(removeButton);
+
+            $(removeButton).on("click", event => {
+                removeFields(newFormationField);
+            })
+
+            // Insere os novos campos.
+            $(newFormationField).insertAfter(formationFieldsDiv.last());
+
+        });
+
+        const appendField = (fieldArea, currentIndex, fieldAreaName) => {
+            const fieldDiv = $(fieldArea).find(`#${fieldAreaName}_${currentIndex}`).clone();
+
+            const label = fieldDiv.find("label");
+            const input = fieldDiv.find("input, select");
+            const errorSpan = input.next("span");
+
+            const newIndex = currentIndex + 1;
+
+            $(label).attr("for", `UserData_AcademicFormations_${newIndex}__${fieldAreaName}`);
+
+            $(input).attr("id", `UserData_AcademicFormations_${newIndex}__${fieldAreaName}`);
+            $(input).attr("name", `UserData.AcademicFormations[${newIndex}].${fieldAreaName}`);
+            $(input).val("");
+
+            $(errorSpan).attr("data-valmsg-for", `UserData.AcademicFormations[${newIndex}].${fieldAreaName}`);
+            $(errorSpan).removeClass("field-validation-error");
+            $(errorSpan).addClass("field-validation-valid");
+            $(errorSpan).html("");
+
+            $(fieldDiv).attr("id", `${fieldAreaName}_${newIndex}`);
+
+            return fieldDiv;
+        }
+
+        const removeFields = formationArea => {
+           
+            $(formationArea).remove();
+
+            const formationFieldsDiv = $("[data-id='Formation']");
+
+            $(formationFieldsDiv).each((newIndex, fieldDiv) => {
+                const fieldRegionIndex = $(fieldDiv).attr("data-index");
+
+                const academicFormationFields = @Html.Raw(@Model.AcademicFormationFields);
+
+                academicFormationFields.forEach(field => {
+                    const formField = $(fieldDiv).find(`#${field}_${fieldRegionIndex}`);
+
+                    const label = $(formField).find("label");
+                    const input = $(formField).find("input, select");
+                    const errorSpan = $(input).next("span");
+
+                    $(label).attr("for", `UserData_AcademicFormations_${newIndex}__${field}`);
+
+                    $(input).attr("id", `UserData_AcademicFormations_${newIndex}__${field}`);
+                    $(input).attr("name", `UserData.AcademicFormations[${newIndex}].${field}`);
+                    $(errorSpan).attr("data-valmsg-for", `UserData.AcademicFormations[${newIndex}].${field}`);
+
+                    $(formField).attr("id", `${field}_${newIndex}`);
+                });
+
+                $(fieldDiv).attr("data-index", newIndex);
+            });
+        }
+
+    </script>
+}
+
+<script>
+    // const btnNewFormation = document.querySelector("#btnNewFormation");
+
+    // btnNewFormation.addEventListener("click", event => {
+    //     const formation = document.querySelector("#formation");
+
+    //     formation.append(`
+    //          <div class="col-lg-4">
+    //                     <label class="form-label">
+    //                         Curso
+    //                     </label>
+    //                     <br />
+    //                     <input type="text" class="form-control"   />
+    //                     <span   class="text-danger"></span>
+    //           </div>
+    //         `);
+    // });
+
+</script>

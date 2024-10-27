@@ -26,6 +26,6 @@ namespace Lab.Communication.Request.User
 
         public string Password { get; set; }
 
-        public AcademicFormation AcademicFormation { get; set; }
+        public List<AcademicFormation> AcademicFormations { get; set; } = new();
     }
 }

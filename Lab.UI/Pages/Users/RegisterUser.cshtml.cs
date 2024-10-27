@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text.Json;
 
 namespace Lab.UI.Pages.Users
 {
@@ -10,7 +11,7 @@ namespace Lab.UI.Pages.Users
     {
 
         [BindProperty]
-        public User UserData { get; set; }
+        public User UserData { get; set; } = new();
 
         private const string PAGE_TITLE = "Criar conta";
 
@@ -18,9 +19,20 @@ namespace Lab.UI.Pages.Users
         
         public List<SelectListItem> AcademicStatusOptions { get; set; }
 
+        public string AcademicFormationFields { get; set; }
+
+
+        public IActionResult OnGet()
+        {
+            // Inicializa com os campos de formação acadêmica em branco
+            UserData.AcademicFormations.Add(new AcademicFormation() { Course = "", Formation = 0, Institution = "", Status = 0 });
+
+            return Page();
+        }
+
         public override void OnPageHandlerExecuting(PageHandlerExecutingContext context)
         {
-            ViewData["Title"] = PAGE_TITLE;
+            ViewData["Title"] = PAGE_TITLE;            
 
             // TODO: Criar enum
             AcademicFormationOptions = new List<SelectListItem> {
@@ -42,6 +54,11 @@ namespace Lab.UI.Pages.Users
                 new ("Trancado", "2"),
                 new ("Concluído", "3"),
             };
+
+            AcademicFormationFields = JsonSerializer.Serialize(typeof(AcademicFormation)
+                .GetProperties()
+                .Select(p => p.Name)
+                .ToArray());
         }
 
         public IActionResult OnPost()

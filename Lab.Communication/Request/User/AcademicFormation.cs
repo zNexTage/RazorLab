@@ -9,10 +9,7 @@ namespace Lab.Communication.Request.User
 {
     public class AcademicFormation
     {
-        [Required(ErrorMessage = "Informe a instituição")]
-        [StringLength(100, ErrorMessage = "A instituição deve ter no máximo 100 caracteres")]
-        public string Institution { get; set; }
-
+        [Display(Name = "Curso")]
         [Required(ErrorMessage = "Informe o curso")]
         [StringLength(100, ErrorMessage = "O curso deve ter no máximo 100 caracteres")]
         public string Course { get; set; }
@@ -20,8 +17,13 @@ namespace Lab.Communication.Request.User
         [Range(1, int.MaxValue, ErrorMessage = "Informe qual o status do curso. (em progresso, concluído, etc...)")]
         public int Status { get; set; }
 
-
+        [Display(Name = "Nível de formação")]
         [Range(1, int.MaxValue, ErrorMessage = "Informe seu nível de formação.")]
         public int Formation { get; set; }
+
+        [Display(Name = "Instituição")]
+        [Required(ErrorMessage = "Informe a instituição")]
+        [StringLength(100, ErrorMessage = "A instituição deve ter no máximo 100 caracteres")]
+        public string Institution { get; set; }
     }
 }
