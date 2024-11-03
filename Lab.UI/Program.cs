@@ -7,8 +7,8 @@ builder.Services.AddRazorPages();
 
 var connectionString = builder.Configuration.GetConnectionString("SqlServerConnectionString");
 
-// Configuração do NHibernate.
-builder.Services.AddNHiberSqlServer(connectionString);
+// Adiciona as funcionalidades da camada de infra.
+builder.Services.AddInfra(connectionString);
 
 var app = builder.Build();
 

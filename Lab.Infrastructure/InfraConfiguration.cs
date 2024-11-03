@@ -1,5 +1,8 @@
 ﻿using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
+using Lab.Domain.Entities;
+using Lab.Domain.Repositories;
+using Lab.Infrastructure.DataAccess.Repositories.User;
 using Microsoft.Extensions.DependencyInjection;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
@@ -8,6 +11,19 @@ namespace Lab.Infrastructure
 {
     public static class InfraConfiguration
     {
+        public static void AddInfra(this IServiceCollection servicesCollection, string connectionString)
+        {
+            AddNHiberSqlServer(servicesCollection, connectionString);
+
+            AddRepositories(servicesCollection);
+        }
+
+        private static void AddRepositories(IServiceCollection servicesCollection) {
+            servicesCollection.AddKeyedScoped<IWriteOnlyRepository<ApplicationUser>, UserWriteOnlyRepository>("WUser");
+        }
+
+
+
         /// <summary>
         /// Cria as tabelas na base de dados.
         /// </summary>
@@ -24,7 +40,7 @@ namespace Lab.Infrastructure
         /// </summary>
         /// <param name="servicesCollection"></param>
         /// <param name="connectionString"></param>
-        public static void AddNHiberSqlServer(this IServiceCollection servicesCollection, string connectionString)
+        private static void AddNHiberSqlServer(IServiceCollection servicesCollection, string connectionString)
         {
             var assembly = typeof(InfraConfiguration).Assembly;
 
@@ -42,6 +58,8 @@ namespace Lab.Infrastructure
                 return factory.OpenSession();
             });
         }
+
+
 
     }
 }
