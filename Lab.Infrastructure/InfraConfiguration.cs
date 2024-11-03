@@ -1,35 +1,48 @@
-﻿using Lab.Infrastructure.DataAccess;
-using Microsoft.EntityFrameworkCore;
+﻿using FluentNHibernate.Cfg;
+using FluentNHibernate.Cfg.Db;
+using Lab.Infrastructure.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
+using NHibernate.Cfg;
+using NHibernate.Tool.hbm2ddl;
+using System.Reflection;
 
 namespace Lab.Infrastructure
 {
     public static class InfraConfiguration
     {
-        public static void AddSqlServerContext(this IServiceCollection servicesCollection, string connectionString)
+        /// <summary>
+        /// Cria as tabelas na base de dados.
+        /// </summary>
+        /// <param name="configuration"></param>
+        private static void Migrate(Configuration configuration)
         {
-            servicesCollection.AddDbContext<LabContext>(opts =>
-            {
-                opts.UseSqlServer(connectionString);
-            });
+            var exporter = new SchemaExport(configuration);
+            exporter.Execute(false, true, false);
         }
 
-        public static void CheckDbConnection(this IServiceProvider provider)
+        /// <summary>
+        /// Configura o NHibernate para utilizar o SQL Server. Além disso, utilizando os mapeamentos das entidades, 
+        /// é feito a criação das tabelas.
+        /// </summary>
+        /// <param name="servicesCollection"></param>
+        /// <param name="connectionString"></param>
+        public static void AddNHiberSqlServer(this IServiceCollection servicesCollection, string connectionString)
         {
-            var scope = provider.CreateScope();
+            var assembly = typeof(InfraConfiguration).Assembly;
 
-            var context = scope.ServiceProvider.GetRequiredService<LabContext>();
+            var config = Fluently.Configure()
+                .Database(MsSqlConfiguration.MsSql2012.ConnectionString(connectionString))
+                .Mappings(m => m.FluentMappings.AddFromAssembly(assembly))
+                .BuildConfiguration();
 
-            if (!context.Database.CanConnect())
+            Migrate(config);
+
+            var factory = config.BuildSessionFactory();
+
+            servicesCollection.AddScoped(opt =>
             {
-                throw new Exception("Não foi possível se conectar com a base de dados. Verifique a connection string.");
-            }
+                return factory.OpenSession();
+            });
         }
 
     }
