@@ -1,7 +1,4 @@
 using Lab.Infrastructure;
-using Lab.Infrastructure.DataAccess;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,12 +7,10 @@ builder.Services.AddRazorPages();
 
 var connectionString = builder.Configuration.GetConnectionString("SqlServerConnectionString");
 
-// Adiciona o contexto para usar o SQL Server
-builder.Services.AddSqlServerContext(connectionString);
+// Configuração do NHibernate.
+builder.Services.AddNHiberSqlServer(connectionString);
 
 var app = builder.Build();
-
-app.Services.CheckDbConnection();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
