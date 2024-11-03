@@ -1,5 +1,6 @@
 using Lab.Communication.Request.User;
 using Lab.Domain.Entities;
+using Lab.Domain.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,11 +12,11 @@ namespace Lab.UI.Pages.Users
 {
     public class RegisterUserModel : PageModel
     {
-        private readonly NHibernate.ISession _session;
+        private readonly IWriteOnlyRepository<ApplicationUser> _repository;
 
-        public RegisterUserModel(NHibernate.ISession session)
+        public RegisterUserModel([FromKeyedServices("WUser")]IWriteOnlyRepository<ApplicationUser> repository)
         {
-            _session = session;
+            _repository = repository;
         }
 
         [BindProperty]
@@ -84,8 +85,7 @@ namespace Lab.UI.Pages.Users
                 UserName = UserData.UserName
             };
 
-            var result = (string)await _session.SaveAsync(user);
-            await _session.FlushAsync();
+            var result = await _repository.Create(user);
 
             return Page();
         }
