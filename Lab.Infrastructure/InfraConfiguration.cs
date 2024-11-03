@@ -1,10 +1,8 @@
 ﻿using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
-using Lab.Infrastructure.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
-using System.Reflection;
 
 namespace Lab.Infrastructure
 {
