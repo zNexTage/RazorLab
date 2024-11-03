@@ -1,14 +1,22 @@
 using Lab.Communication.Request.User;
+using Lab.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NHibernate;
 using System.Text.Json;
 
 namespace Lab.UI.Pages.Users
 {
     public class RegisterUserModel : PageModel
     {
+        private readonly NHibernate.ISession _session;
+
+        public RegisterUserModel(NHibernate.ISession session)
+        {
+            _session = session;
+        }
 
         [BindProperty]
         public User UserData { get; set; } = new();
@@ -60,9 +68,25 @@ namespace Lab.UI.Pages.Users
                 .Select(p => p.Name)
                 .ToArray());
         }
+    
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
 
-        public IActionResult OnPost()
-        {   
+            var user = new ApplicationUser()
+            {
+                Name = UserData.Name,
+                Email = UserData.Email,
+                Password = UserData.Password,
+                UserName = UserData.UserName
+            };
+
+            var result = (string)await _session.SaveAsync(user);
+            await _session.FlushAsync();
+
             return Page();
         }
     }
