@@ -1,3 +1,4 @@
+using Lab.Application;
 using Lab.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,8 @@ var connectionString = builder.Configuration.GetConnectionString("SqlServerConne
 
 // Adiciona as funcionalidades da camada de infra.
 builder.Services.AddInfra(connectionString);
+
+builder.Services.AddApplication();
 
 var app = builder.Build();
 
