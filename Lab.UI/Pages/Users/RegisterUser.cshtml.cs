@@ -5,22 +5,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using NHibernate;
 using System.Text.Json;
+using Lab.Application.UseCases.User;
 
 namespace Lab.UI.Pages.Users
 {
     public class RegisterUserModel : PageModel
     {
-        private readonly IWriteOnlyRepository<ApplicationUser> _repository;
+        private readonly IRegisterUserUseCase _registerUserUseCase;
 
-        public RegisterUserModel([FromKeyedServices("WUser")]IWriteOnlyRepository<ApplicationUser> repository)
+        public RegisterUserModel(IRegisterUserUseCase registerUserUseCase)
         {
-            _repository = repository;
+            _registerUserUseCase = registerUserUseCase;
         }
 
         [BindProperty]
-        public User UserData { get; set; } = new();
+        public RequestUser UserData { get; set; } = new();
 
         private const string PAGE_TITLE = "Criar conta";
 
@@ -77,15 +77,15 @@ namespace Lab.UI.Pages.Users
                 return Page();
             }
 
-            var user = new ApplicationUser()
+            try
             {
-                Name = UserData.Name,
-                Email = UserData.Email,
-                Password = UserData.Password,
-                UserName = UserData.UserName
-            };
+                var user = await _registerUserUseCase.Register(UserData);
 
-            var result = await _repository.Create(user);
+            }
+            catch(Exception err)
+            {
+
+            }
 
             return Page();
         }

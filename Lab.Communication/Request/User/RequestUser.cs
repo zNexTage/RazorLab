@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lab.Communication.Request.User
 {
-    public class User
+    public class RequestUser
     {
         [Required(ErrorMessage = "Informe o nome")]
         [StringLength(100, ErrorMessage = "O nome deve ter no máximo 100 caracteres")]
