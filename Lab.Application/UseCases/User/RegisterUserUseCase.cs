@@ -1,4 +1,5 @@
-﻿using Lab.Communication.Request.User;
+﻿using AutoMapper;
+using Lab.Communication.Request.User;
 using Lab.Domain.Entities;
 using Lab.Domain.Repositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,21 +14,20 @@ namespace Lab.Application.UseCases.User
     public class RegisterUserUseCase : IRegisterUserUseCase
     {
         private readonly IWriteOnlyRepository<ApplicationUser> _repository;
+        private readonly IMapper _mapper;
 
-        public RegisterUserUseCase([FromKeyedServices("WUser")]IWriteOnlyRepository<ApplicationUser> repository)
+        public RegisterUserUseCase(
+            [FromKeyedServices("WUser")]IWriteOnlyRepository<ApplicationUser> repository,
+            IMapper mapper
+            )
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         public async Task<ApplicationUser> Register(RequestUser requestUser)
         {
-            var user = new ApplicationUser()
-            {
-                Name = requestUser.Name,
-                Email = requestUser.Email,
-                Password = requestUser.Password,
-                UserName = requestUser.UserName
-            };
+            var user = _mapper.Map<ApplicationUser>(requestUser);
 
             return await _repository.Create(user);
         }
