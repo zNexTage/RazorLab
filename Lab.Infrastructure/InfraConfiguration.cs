@@ -49,9 +49,9 @@ namespace Lab.Infrastructure
                 .Mappings(m => m.FluentMappings.AddFromAssembly(assembly))
                 .BuildConfiguration();
 
-            Migrate(config);
-
             var factory = config.BuildSessionFactory();
+            
+            Migrate(config);
 
             servicesCollection.AddScoped(opt =>
             {
