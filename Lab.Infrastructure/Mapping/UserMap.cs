@@ -21,9 +21,11 @@ namespace Lab.Infrastructure.Mapping
 
             Map(m => m.Email)
                 .Length(100)
+                .Unique()
                 .Not.Nullable();
 
             Map(m => m.UserName)
+                .Unique()
                 .Length(100)
                 .Not.Nullable();
 
