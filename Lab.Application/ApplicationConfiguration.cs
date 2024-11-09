@@ -23,9 +23,9 @@ namespace Lab.Application
         }
 
         private static void AddAutoMapper(IServiceCollection services) {
-            var mapper = new AutoMapper.MapperConfiguration(options =>
+            var mapper = new AutoMapper.MapperConfiguration(config =>
             {
-                options.AddProfile(new AutoMapping());
+                config.AddMaps(typeof(ApplicationConfiguration).Assembly);
             }).CreateMapper();
 
             services.AddScoped(opt => mapper);
