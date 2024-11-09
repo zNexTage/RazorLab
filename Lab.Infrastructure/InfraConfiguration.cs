@@ -30,8 +30,8 @@ namespace Lab.Infrastructure
         /// <param name="configuration"></param>
         private static void Migrate(Configuration configuration)
         {
-            var exporter = new SchemaExport(configuration);
-            exporter.Execute(false, true, false);
+            var exporter = new SchemaUpdate(configuration);
+            exporter.Execute(false, true);
         }
 
         /// <summary>
