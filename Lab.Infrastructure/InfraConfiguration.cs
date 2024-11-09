@@ -2,15 +2,28 @@
 using FluentNHibernate.Cfg.Db;
 using Lab.Domain.Entities;
 using Lab.Domain.Repositories;
-using Lab.Infrastructure.DataAccess.Configuration;
+using Lab.Domain.Repositories.User;
 using Lab.Infrastructure.DataAccess.Repositories.User;
 using Microsoft.Extensions.DependencyInjection;
 using NHibernate;
 using NHibernate.Cfg;
+using NHibernate.SqlCommand;
 using NHibernate.Tool.hbm2ddl;
+using System.Diagnostics;
 
 namespace Lab.Infrastructure
 {
+    public class SqlDebugOutputInterceptor : EmptyInterceptor
+    {
+        public override SqlString OnPrepareStatement(SqlString sql)
+        {
+            Debug.Write("NHibernate: ");
+            Debug.WriteLine(sql);
+
+            return base.OnPrepareStatement(sql);
+        }
+    }
+
     public static class InfraConfiguration
     {
         public static void AddInfra(this IServiceCollection servicesCollection, string connectionString)
@@ -22,6 +35,7 @@ namespace Lab.Infrastructure
 
         private static void AddRepositories(IServiceCollection servicesCollection) {
             servicesCollection.AddKeyedScoped<IWriteOnlyRepository<ApplicationUser>, UserWriteOnlyRepository>("WUser");
+            servicesCollection.AddScoped<IUserReadOnlyRepository<ApplicationUser>, UserReadOnlyRepository>();
         }
 
 
@@ -44,7 +58,7 @@ namespace Lab.Infrastructure
         /// <param name="connectionString"></param>
         private static void AddNHiberSqlServer(IServiceCollection servicesCollection, string connectionString)
         {
-            var assembly = typeof(NHiberSessionFactory).Assembly;
+            var assembly = typeof(InfraConfiguration).Assembly;
             var configuration = Fluently.Configure()
                 .Database(MsSqlConfiguration.MsSql2012.ConnectionString(connectionString))
                 .Mappings(m => m.FluentMappings.AddFromAssembly(assembly))
@@ -55,7 +69,22 @@ namespace Lab.Infrastructure
             var sessionFactory = configuration.BuildSessionFactory();
 
             servicesCollection.AddScoped<IUnitOfWork, NHiberUnitOfWork>();
-            servicesCollection.AddScoped<ISession>(opt => sessionFactory.OpenSession());
+            servicesCollection.AddScoped<ISession>(opt =>
+            {
+                var interceptor = new SqlDebugOutputInterceptor();
+
+                if (true)
+                {
+                    return sessionFactory
+                    .WithOptions()
+                    .Interceptor(interceptor)
+                    .OpenSession();
+                }
+                else
+                {
+                    return sessionFactory.OpenSession();
+                }
+            });            
         }
 
     }
