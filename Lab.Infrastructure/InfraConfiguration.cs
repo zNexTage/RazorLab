@@ -2,8 +2,10 @@
 using FluentNHibernate.Cfg.Db;
 using Lab.Domain.Entities;
 using Lab.Domain.Repositories;
+using Lab.Infrastructure.DataAccess.Configuration;
 using Lab.Infrastructure.DataAccess.Repositories.User;
 using Microsoft.Extensions.DependencyInjection;
+using NHibernate;
 using NHibernate.Cfg;
 using NHibernate.Tool.hbm2ddl;
 
@@ -42,24 +44,19 @@ namespace Lab.Infrastructure
         /// <param name="connectionString"></param>
         private static void AddNHiberSqlServer(IServiceCollection servicesCollection, string connectionString)
         {
-            var assembly = typeof(InfraConfiguration).Assembly;
-
-            var config = Fluently.Configure()
+            var assembly = typeof(NHiberSessionFactory).Assembly;
+            var configuration = Fluently.Configure()
                 .Database(MsSqlConfiguration.MsSql2012.ConnectionString(connectionString))
                 .Mappings(m => m.FluentMappings.AddFromAssembly(assembly))
                 .BuildConfiguration();
 
-            var factory = config.BuildSessionFactory();
-            
-            Migrate(config);
+            Migrate(configuration);
 
-            servicesCollection.AddScoped(opt =>
-            {
-                return factory.OpenSession();
-            });
+            var sessionFactory = configuration.BuildSessionFactory();
+
+            servicesCollection.AddScoped<IUnitOfWork, NHiberUnitOfWork>();
+            servicesCollection.AddScoped<ISession>(opt => sessionFactory.OpenSession());
         }
-
-
 
     }
 }

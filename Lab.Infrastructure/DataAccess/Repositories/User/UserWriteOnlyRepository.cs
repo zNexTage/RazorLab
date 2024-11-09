@@ -20,7 +20,6 @@ namespace Lab.Infrastructure.DataAccess.Repositories.User
         public async Task<ApplicationUser> Create(ApplicationUser obj)
         {
             var result = (string)await _session.SaveAsync(obj);
-            await _session.FlushAsync();
 
             return obj;
         }
@@ -28,7 +27,6 @@ namespace Lab.Infrastructure.DataAccess.Repositories.User
         public async Task<ApplicationUser> Update(ApplicationUser obj)
         {
             await _session.UpdateAsync(obj);
-            await _session.FlushAsync();
             return obj;
         }
     }
