@@ -71,11 +71,7 @@ namespace Lab.UI.Pages.Users
         }
     
         public async Task<IActionResult> OnPostAsync()
-        {
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
+        {          
 
             try
             {

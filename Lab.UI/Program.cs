@@ -1,10 +1,14 @@
 using Lab.Application;
 using Lab.Infrastructure;
+using Lab.UI.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages().AddMvcOptions(options =>
+{
+    options.Filters.Add<ModelValidationFilter>();
+});
 
 var connectionString = builder.Configuration.GetConnectionString("SqlServerConnectionString");
 
